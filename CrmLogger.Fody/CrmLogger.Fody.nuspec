@@ -1,0 +1,57 @@
+﻿<?xml version="1.0"?>
+
+<package>
+  <metadata>
+    <id>CrmLogger.Fody</id>
+    <version>1.3.4</version>
+    <authors>Ahmed el-Sawalhy</authors>
+    <owners>Ahmed el-Sawalhy</owners>
+    <projectUrl>http://yagasoft.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>CRM Logger function entry, exit, parameters, and return value IL injector.</summary>
+    <description>CrmLogger.Fody is a Fody add-in that injects logging for function entry, exit, parameters, and return value for Dynamics CRM Logger solution.</description>
+    <copyright>Copyright 2017</copyright>
+    <tags>Fody, Cecil, weaving, weave, Mono, IL, ILWeaving, logging, log, logger, log, CrmLogger, CrmLog, CRM, Dynamics, 365, 2016</tags>
+    <developmentDependency>true</developmentDependency>
+    <dependencies>
+      <group>
+        <dependency id="Fody" version="2.1.2" />
+      </group>
+    </dependencies>
+    <references />
+    <releaseNotes>
+      * 1.3.4
+      Updated: project URL
+      * 1.3.3
+      Fixed: a null exception when not using the Common assembly
+      * 1.3.2
+      Fixed: CrmLog referenced in the Common assembly not working
+      * 1.2.2
+      Fixed: Fody running in Debug config affecting the assembly in a minimal but detectable way
+      * 1.2.1
+      Fixed: issue with invalid pointers to injected local variables
+      * 1.1.7
+      Fixed: skipped logging of anonymous methods created by the compiler
+      * 1.1.6
+      Added: logging to Build Output
+      Changed: limited weaving to Release build only to avoid unexpected issues
+      Fixed: an issue with accessing fields in generic base classes
+      * 1.1.5
+      Fixed: an issue with accessing fields in generic base classes
+      * 1.1.4
+      Fixed: an issue with Sandbox plugins
+      * 1.1.3
+      Added: additional check for missing static log property/field for static functions
+      Fixed: Fody not being able to detect this plugin assembly
+      * 1.1.2
+      Removed: redundant files
+      * 1.1.1
+      Initial release
+    </releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\CrmLogger.Fody.dll" target="CrmLogger.Fody.dll" />
+    <file src="tools\install.ps1" target="tools\install.ps1" />
+    <file src="tools\uninstall.ps1" target="tools\uninstall.ps1" />
+  </files>
+</package>
