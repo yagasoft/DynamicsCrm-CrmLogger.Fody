@@ -1,4 +1,7 @@
 # DynamicsCrm-CrmLogger.Fody
+
+[![Join the chat at https://gitter.im/yagasoft/DynamicsCrm-CrmLogger.Fody](https://badges.gitter.im/yagasoft/DynamicsCrm-CrmLogger.Fody.svg)](https://gitter.im/yagasoft/DynamicsCrm-CrmLogger.Fody?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### Version: 1.1
 ---
 
