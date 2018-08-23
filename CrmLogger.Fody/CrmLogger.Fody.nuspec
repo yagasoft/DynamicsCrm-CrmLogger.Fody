@@ -9,7 +9,7 @@
     <projectUrl>http://yagasoft.com</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>CRM Logger function entry, exit, parameters, and return value IL injector.</summary>
-    <description>CrmLogger.Fody is a Fody add-in that injects logging for function entry, exit, parameters, and return value for Dynamics CRM Logger solution.</description>
+    <description>CrmLogger.Fody is a Fody add-in that injects logging for function entry, exit, parameters, and return value for Dynamics CRM Logger (https://github.com/yagasoft/DynamicsCrm-CrmLogger) solution.</description>
     <copyright>Copyright 2017</copyright>
     <tags>Fody, Cecil, weaving, weave, Mono, IL, ILWeaving, logging, log, logger, log, CrmLogger, CrmLog, CRM, Dynamics, 365, 2016</tags>
     <developmentDependency>true</developmentDependency>
