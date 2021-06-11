@@ -1,6 +1,6 @@
 ﻿$scriptpath = split-path -parent $MyInvocation.MyCommand.Path
 $keyfile = "$scriptpath/../nuget-access-key.txt"
-$nugetpath = resolve-path "$scriptpath/../../nuget.exe"
+$nugetpath = resolve-path "$scriptpath/../../lib/nuget.exe"
 $packagespath = resolve-path "$scriptpath/../bin/Release"
  
 if(-not (test-path $keyfile)) {
@@ -40,3 +40,5 @@ else {
   }
   popd
 }
+
+Pause

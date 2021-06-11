@@ -185,7 +185,7 @@ public class ModuleWeaver
 			// find the common assembly in the NuGet packages
 			var packagesFolder = GetPackagesFolder();
 			var assemblyPath = Directory
-				.GetFiles(packagesFolder, "LinkDev.Libraries.Common.dll", SearchOption.AllDirectories).FirstOrDefault();
+				.GetFiles(packagesFolder, "Yagasoft.Libraries.Common.dll", SearchOption.AllDirectories).FirstOrDefault();
 
 			LogInfo($"{assemblyPath}");
 
@@ -231,8 +231,8 @@ public class ModuleWeaver
 	private void ProcessType(TypeDefinition type)
 	{
 		Method = null;
-		var isTypeLogAttributeExist = type.CustomAttributes.ContainsAttribute("LinkDev.Libraries.Common.LogAttribute");
-		var isTypeNoLogAttributeExist = type.CustomAttributes.ContainsAttribute("LinkDev.Libraries.Common.NoLogAttribute");
+		var isTypeLogAttributeExist = type.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.LogAttribute");
+		var isTypeNoLogAttributeExist = type.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.NoLogAttribute");
 
 		if (isTypeNoLogAttributeExist)
 		{
@@ -243,8 +243,8 @@ public class ModuleWeaver
 
 		foreach (var method in type.Methods)
 		{
-			var isMethodLogAttributeExist = method.CustomAttributes.ContainsAttribute("LinkDev.Libraries.Common.LogAttribute");
-			var isMethodNoLogAttributeExist = method.CustomAttributes.ContainsAttribute("LinkDev.Libraries.Common.NoLogAttribute");
+			var isMethodLogAttributeExist = method.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.LogAttribute");
+			var isMethodNoLogAttributeExist = method.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.NoLogAttribute");
 			var isLogMethod = isMethodLogAttributeExist
 				|| (isTypeLogAttributeExist && !isMethodNoLogAttributeExist);
 			var isAsync = method.CustomAttributes.Any(a => a.AttributeType.Name == "AsyncStateMachineAttribute");

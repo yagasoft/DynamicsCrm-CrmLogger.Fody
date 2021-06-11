@@ -78,7 +78,7 @@
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\packages\ClassLibrary1.Fody.1.0.0" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)nuget.exe pack $(ProjectPath) -Prop Configuration=Release
+    <PostBuildEvent>$(SolutionDir)lib/nuget.exe pack $(ProjectPath) -Prop Configuration=Release
 copy /Y "$(TargetDir)*.nupkg" "C:\Nuget.Local\"
 copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)packages\CrmLogger.Fody.1.1.6\"</PostBuildEvent>
   </PropertyGroup>
