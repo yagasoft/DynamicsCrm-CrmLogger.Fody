@@ -2,12 +2,16 @@
 
 [![Join the chat at https://gitter.im/yagasoft/DynamicsCrm-CrmLogger.Fody](https://badges.gitter.im/yagasoft/DynamicsCrm-CrmLogger.Fody.svg)](https://gitter.im/yagasoft/DynamicsCrm-CrmLogger.Fody?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-### Version: 1.4.1
+### Version: 1.4.3
 ---
 
 NuGet package that extremely simplifies logging function entry, exit, parameter and return values. Used with [DynamicsCrm-CrmLogger](https://github.com/yagasoft/DynamicsCrm-CrmLogger) solution.
 
-The user simply installs it from NuGet, adds a Log attribute above classes, and it does the rest on compile.
+###
+
+  + Install package from NuGet
+  + Add a Log attribute above classes
+  + Log entries will be added automatically in the project Release build mode
 
 ### Dependencies
 

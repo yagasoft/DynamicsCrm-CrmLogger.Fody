@@ -378,7 +378,7 @@ public static class CecilExtensions
 	/// Author: Ahmed el-Sawalhy<br />
 	/// Credit: http://blog.stevesindelar.cz/mono-cecil-how-to-get-all-base-types-and-interfaces-with-resolved-generic-arguments
 	/// </summary>
-	public static FieldReference GetLoggerWithProperType(this TypeDefinition type, TypeDefinition loggerTypeDefinition)
+	public static LoggerField GetLoggerWithProperType(this TypeDefinition type, TypeDefinition loggerTypeDefinition)
 	{
 		var current = type;
 		var mappedFromSuperType = new List<TypeReference>();
@@ -387,14 +387,23 @@ public static class CecilExtensions
 
 		var returnValue = type.GetGeneric();
 
+		var isInherited = false;
+
 		do
 		{
 			var loggerField = current.Fields.FirstOrDefault(x => x.FieldType.FullName == loggerTypeDefinition.FullName);
 
 			if (loggerField != null)
 			{
-				return new FieldReference(loggerField.Name, loggerField.FieldType, returnValue);
+				return
+					new LoggerField
+					{
+						Reference = new FieldReference(loggerField.Name, loggerField.FieldType, returnValue),
+						IsInherited = isInherited
+					};
 			}
+
+			isInherited = true;
 
 			var currentBase = current.BaseType;
 
@@ -517,5 +526,11 @@ public static class CecilExtensions
 	public static bool IsAnonymous(this MethodDefinition method)
 	{
 		return Regex.IsMatch(method.Name, "^<\\w*?>\\w*?__\\w*?_\\d*");
+	}
+
+	public class LoggerField
+	{
+		internal FieldReference Reference;
+		internal bool IsInherited;
 	}
 }

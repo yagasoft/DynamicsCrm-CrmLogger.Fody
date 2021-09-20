@@ -256,24 +256,35 @@ public class ModuleWeaver
 				continue;
 			}
 
-			LoggerField = type.GetLoggerWithProperType(LoggerTypeDefinition);
+			var loggerFieldInfo = type.GetLoggerWithProperType(LoggerTypeDefinition);
+
+			LoggerField = loggerFieldInfo.Reference;
 
 			if (LoggerField == null)
 			{
-				throw new WeavingException($"Cannot find logger field in class: {type.FullName}");
+				throw new WeavingException($"Cannot find logger field in class: {type.FullName}.");
 			}
 
-			if (LoggerField.Resolve() == null)
+			var resolution = LoggerField.Resolve();
+
+			if (resolution == null)
 			{
 				throw new WeavingException($"Cannot form proper typed access for the logger field in class:"
-					+ $" {LoggerField.DeclaringType.FullName}");
+					+ $" {LoggerField.DeclaringType.FullName}.");
+			}
+			
+			var isPrivate = resolution.IsPrivate;
+
+			if (isPrivate && loggerFieldInfo.IsInherited)
+			{
+				throw new WeavingException($"Cannot find a logger field in class '{type.FullName}' that is accessible.");
 			}
 
-			IsInstanceLogger = LoggerField.Resolve()?.IsStatic == false;
+			IsInstanceLogger = !resolution.IsStatic;
 			
 			if (IsInstanceLogger && isStatic)
 			{
-				throw new WeavingException($"Cannot find a static logger field in class: {type.FullName},"
+				throw new WeavingException($"Cannot find a static logger field in class '{type.FullName}'"
 					+ $" for static function: {method.Name}.");
 			}
 
@@ -292,7 +303,7 @@ public class ModuleWeaver
 
 		if (isLoggedTypeInConsole)
 		{
-			LogInfo($"^^^^^ Finished: {type.FullName} ^^^^^");
+			LogInfo($"-----------------------------------------------------------------------------------------");
 		}
 	}
 
@@ -424,8 +435,8 @@ public class ModuleWeaver
 		var traceEnterNeedsParamArray = body.Method.Parameters.Any(param => !param.IsOut);
 		var traceEnterParamArraySize = body.Method.Parameters.Count(param => !param.IsOut);
 
-		var stringArrayVar = new VariableDefinition(ModuleDefinition.Import(typeof(string[])));
-		var objectArrayVar = new VariableDefinition(ModuleDefinition.Import(typeof(object[])));
+		var stringArrayVar = new VariableDefinition(ModuleDefinition.ImportReference(typeof(string[])));
+		var objectArrayVar = new VariableDefinition(ModuleDefinition.ImportReference(typeof(object[])));
 
 		if (traceEnterNeedsParamArray)
 		{
@@ -540,8 +551,8 @@ public class ModuleWeaver
 	{
 		var instructions = new List<Instruction>();
 
-		var stringArrayVar = new VariableDefinition(ModuleDefinition.Import(typeof(string[])));
-		var objectArrayVar = new VariableDefinition(ModuleDefinition.Import(typeof(object[])));
+		var stringArrayVar = new VariableDefinition(ModuleDefinition.ImportReference(typeof(string[])));
+		var objectArrayVar = new VariableDefinition(ModuleDefinition.ImportReference(typeof(object[])));
 
 		var hasReturnValue = Method.ReturnType.MetadataType != MetadataType.Void;
 
