@@ -3,7 +3,7 @@
 <package>
   <metadata>
     <id>CrmLogger.Fody</id>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
     <authors>Ahmed Elsawalhy</authors>
     <owners>Ahmed Elsawalhy</owners>
     <projectUrl>https://yagasoft.com</projectUrl>
@@ -16,12 +16,11 @@
     <dependencies>
       <group>
         <dependency id="Fody" version="2.1.2" />
-        <dependency id="Yagasoft.Libraries.Common" version="5.3.3" />
       </group>
     </dependencies>
     <references />
     <releaseNotes>
-      * 1.4.3
+      * 1.4.4
       Fixed: validate that the log object is accessible
       * 1.4.1
       Changed: moved to new logger namespace
