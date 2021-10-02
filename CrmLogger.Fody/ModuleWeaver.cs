@@ -126,12 +126,14 @@ public class ModuleWeaver
 
 	public void Execute()
 	{
+		LogInfo($"Assembly path: {AssemblyFilePath}.");
+
 		if (AssemblyFilePath.Contains("\\obj\\Debug"))
 		{
 			LogWarning("~~~~~ Skipping weaving because of a debug build ~~~~~");
 			return;
 		}
-
+		
 		LoadSystemTypes();
 		Init();
 
@@ -159,9 +161,10 @@ public class ModuleWeaver
 
 	private string GetPackagesFolder(string currentFolder = null)
 	{
-		while (true)
+		currentFolder = currentFolder ?? Directory.GetCurrentDirectory();
+
+		while (currentFolder != null)
 		{
-			currentFolder = currentFolder ?? Directory.GetCurrentDirectory();
 			var packagesFolder = Path.Combine(currentFolder, "packages");
 			var isPackagesFolderExists = Directory.Exists(packagesFolder);
 
@@ -170,8 +173,10 @@ public class ModuleWeaver
 				return packagesFolder;
 			}
 
-			currentFolder = Directory.GetParent(currentFolder).FullName;
+			currentFolder = Directory.GetParent(currentFolder)?.FullName;
 		}
+
+		return null;
 	}
 
 	ModuleDefinition CommonModuleDefinition;
@@ -179,22 +184,29 @@ public class ModuleWeaver
 	public void Init()
 	{
 		LoggerTypeDefinition = ModuleDefinition.Types.FirstOrDefault(x => x.Name == "CrmLog");
+		LogInfo($"Logger type: {LoggerTypeDefinition?.FullName}.");
 
 		if (LoggerTypeDefinition == null)
 		{
 			// find the common assembly in the NuGet packages
 			var packagesFolder = GetPackagesFolder();
-			var assemblyPath = Directory
-				.GetFiles(packagesFolder, "Yagasoft.Libraries.Common.dll", SearchOption.AllDirectories).FirstOrDefault();
 
-			LogInfo($"{assemblyPath}");
-
-			if (assemblyPath != null)
+			LogInfo($"Package folder: {packagesFolder}.");
+			
+			if (packagesFolder != null)
 			{
-				CommonModuleDefinition = AssemblyDefinition.ReadAssembly(assemblyPath).MainModule;
-				LoggerTypeDefinition = CommonModuleDefinition.Types.FirstOrDefault(x => x.Name.Contains("CrmLog"));
-				LogInfo($"{LoggerTypeDefinition?.FullName}");
-				ModuleDefinition.ImportReference(LoggerTypeDefinition);
+				var assemblyPath = Directory
+					.GetFiles(packagesFolder, "Yagasoft.Libraries.Common.dll", SearchOption.AllDirectories).FirstOrDefault();
+
+				LogInfo($"YS Common DLL: {assemblyPath}.");
+
+				if (assemblyPath != null)
+				{
+					CommonModuleDefinition = AssemblyDefinition.ReadAssembly(assemblyPath).MainModule;
+					LoggerTypeDefinition = CommonModuleDefinition.Types.FirstOrDefault(x => x.Name.Contains("CrmLog"));
+					LogInfo($"Logger type: {LoggerTypeDefinition?.FullName}.");
+					ModuleDefinition.ImportReference(LoggerTypeDefinition);
+				}
 			}
 		}
 		else
@@ -231,11 +243,13 @@ public class ModuleWeaver
 	private void ProcessType(TypeDefinition type)
 	{
 		Method = null;
+
 		var isTypeLogAttributeExist = type.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.LogAttribute");
 		var isTypeNoLogAttributeExist = type.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.NoLogAttribute");
 
 		if (isTypeNoLogAttributeExist)
 		{
+			LogInfo($"Type '{type}' is marked with NoLog. Skipping.");
 			return;
 		}
 
@@ -247,7 +261,7 @@ public class ModuleWeaver
 			var isMethodNoLogAttributeExist = method.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.NoLogAttribute");
 			var isLogMethod = isMethodLogAttributeExist
 				|| (isTypeLogAttributeExist && !isMethodNoLogAttributeExist);
-			var isAsync = method.CustomAttributes.Any(a => a.AttributeType.Name == "AsyncStateMachineAttribute");
+			var isAsync = method.CustomAttributes.Any(a => a?.AttributeType?.Name == "AsyncStateMachineAttribute");
 			var isStatic = method.IsStatic;
 
 			//skip for abstract and delegates
@@ -257,8 +271,7 @@ public class ModuleWeaver
 			}
 
 			var loggerFieldInfo = type.GetLoggerWithProperType(LoggerTypeDefinition);
-
-			LoggerField = loggerFieldInfo.Reference;
+			LoggerField = loggerFieldInfo?.Reference;
 
 			if (LoggerField == null)
 			{

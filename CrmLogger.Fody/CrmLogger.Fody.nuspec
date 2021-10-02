@@ -3,7 +3,7 @@
 <package>
   <metadata>
     <id>CrmLogger.Fody</id>
-    <version>1.4.4</version>
+    <version>1.5.1</version>
     <authors>Ahmed Elsawalhy</authors>
     <owners>Ahmed Elsawalhy</owners>
     <projectUrl>https://yagasoft.com</projectUrl>
@@ -15,11 +15,13 @@
     <developmentDependency>true</developmentDependency>
     <dependencies>
       <group>
-        <dependency id="Fody" version="2.1.2" />
+        <dependency id="Fody" version="2.4.6" />
       </group>
     </dependencies>
     <references />
     <releaseNotes>
+      * 1.5.1
+      Update: upgraded NuGet packages to latest supported
       * 1.4.4
       Fixed: validate that the log object is accessible
       * 1.4.1
