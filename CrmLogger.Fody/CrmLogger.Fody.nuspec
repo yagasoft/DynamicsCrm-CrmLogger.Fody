@@ -3,7 +3,7 @@
 <package>
   <metadata>
     <id>CrmLogger.Fody</id>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
     <authors>Ahmed Elsawalhy</authors>
     <owners>Ahmed Elsawalhy</owners>
     <projectUrl>https://yagasoft.com</projectUrl>
@@ -20,7 +20,8 @@
     </dependencies>
     <references />
     <releaseNotes>
-      * 1.5.1
+      * 1.5.2
+      Added: log execution end attribute
       Update: upgraded NuGet packages to latest supported
       * 1.4.4
       Fixed: validate that the log object is accessible

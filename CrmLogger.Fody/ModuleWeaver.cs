@@ -33,6 +33,7 @@ public class ModuleWeaver
 	public MethodReference ParamsMethod;
 	public MethodReference ExceptionMethod;
 	public MethodReference EndMethod;
+	public MethodReference EndExecMethod;
 
 	public TypeReference String => ModuleDefinition.TypeSystem.String;
 	public TypeReference Object => ModuleDefinition.TypeSystem.Object;
@@ -237,6 +238,10 @@ public class ModuleWeaver
 			.FindMethod("LogFunctionEnd", "LogEntry", "IExecutionContext", "String", "String", "String", "Int32"));
 		EndMethod = ModuleDefinition.ImportReference(EndMethod);
 
+		EndExecMethod = CommonModuleDefinition.ImportReference(LoggerTypeDefinition
+			.FindMethod("LogExecutionEndSuccessFlush", "LogEntry", "IExecutionContext", "String", "String", "String", "Int32"));
+		EndExecMethod = ModuleDefinition.ImportReference(EndExecMethod);
+
 		exceptionVariable = new VariableDefinition(ModuleDefinition.ImportReference(ExceptionType));
 	}
 
@@ -366,6 +371,15 @@ public class ModuleWeaver
 
 		var endInstructions = new List<Instruction>();
 		endInstructions.AddRange(GetEndInstructions());
+
+		var isMethodLogExecEndAttributeExist = Method.CustomAttributes.ContainsAttribute("Yagasoft.Libraries.Common.LogExecEndAttribute");
+
+		if (isMethodLogExecEndAttributeExist)
+		{
+			LogInfo($">> Method is set to end execution.");
+			endInstructions.AddRange(GetExecEndInstructions());
+		}
+
 		var finallyInstruction = Instruction.Create(OpCodes.Endfinally);
 		endInstructions.Add(finallyInstruction);
 		endInstructions.Reverse();
@@ -558,6 +572,11 @@ public class ModuleWeaver
 		yield return Instruction.Create(OpCodes.Ldc_I4, lineNumber);
 
 		yield return Instruction.Create(IsInstanceLogger ? OpCodes.Callvirt : OpCodes.Call, writeMethod);
+	}
+
+	private IEnumerable<Instruction> GetExecEndInstructions()
+	{
+		return AddWriteStartEnd(EndExecMethod, false);
 	}
 
 	protected List<Instruction> GetReturnValueInstructions(VariableDefinition returnVariable)
