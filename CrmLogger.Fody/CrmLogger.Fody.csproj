@@ -77,14 +77,16 @@
   <ItemGroup>
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CrmLogger.FodyWeavers.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\packages\ClassLibrary1.Fody.1.0.0" />
   </Target>
   <PropertyGroup>
     <PostBuildEvent>$(SolutionDir)lib/nuget.exe pack $(ProjectPath) -Prop Configuration=Release
-copy /Y "$(TargetDir)*.nupkg" "C:\Nuget.Local\"
-copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)packages\CrmLogger.Fody.1.5.2\lib\net452\"</PostBuildEvent>
+copy /Y "$(TargetDir)*.nupkg" "C:\Nuget.Local\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)*.nupkg"</PreBuildEvent>

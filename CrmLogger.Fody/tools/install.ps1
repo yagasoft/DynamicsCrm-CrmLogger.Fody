@@ -87,6 +87,9 @@ function UnlockWeaversXml($project)
     }   
 }
 
+$weaverFile = $project.ProjectItems | where-object {$_.Name -eq "FodyWeavers.xml"} 
+$weaverFile.Properties.Item("BuildAction").Value = [int]0
+
 UnlockWeaversXml($project)
 
 RemoveForceProjectLevelHack $project
@@ -94,8 +97,6 @@ RemoveForceProjectLevelHack $project
 Update-FodyConfig $package.Id.Replace(".Fody", "") $project
 
 Fix-ReferencesCopyLocal $package $project
-
-$project.ExecuteCommand("Project.UnloadProject")
 
 #Load the csproj file into an xml object
 $xml = [XML] (gc $project.FullName)
