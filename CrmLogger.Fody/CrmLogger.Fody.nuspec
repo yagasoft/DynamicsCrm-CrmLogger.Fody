@@ -3,14 +3,14 @@
 <package>
   <metadata>
     <id>CrmLogger.Fody</id>
-    <version>1.5.2</version>
+    <version>2.1.1</version>
     <authors>Ahmed Elsawalhy</authors>
     <owners>Ahmed Elsawalhy</owners>
     <projectUrl>https://yagasoft.com</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>CRM Logger function entry, exit, parameters, and return value IL injector.</summary>
     <description>CrmLogger.Fody is a Fody add-in that injects logging for function entry, exit, parameters, and return value for Dynamics CRM Logger (https://github.com/yagasoft/DynamicsCrm-CrmLogger) solution.</description>
-    <copyright>Copyright 2017</copyright>
+    <copyright>Copyright Ahmed Elsawalhy</copyright>
     <tags>Fody, Cecil, weaving, weave, Mono, IL, ILWeaving, logging, log, logger, log, CrmLogger, CrmLog, CRM, Dynamics, 365, 2016</tags>
     <developmentDependency>true</developmentDependency>
     <dependencies>
@@ -20,6 +20,8 @@
     </dependencies>
     <references />
     <releaseNotes>
+      * 2.1.1
+      Updated: migrated to latest YS library
       * 1.5.2
       Added: log execution end attribute
       Update: upgraded NuGet packages to latest supported

@@ -184,7 +184,7 @@ public class ModuleWeaver
 
 	public void Init()
 	{
-		LoggerTypeDefinition = ModuleDefinition.Types.FirstOrDefault(x => x.Name == "CrmLog");
+		LoggerTypeDefinition = ModuleDefinition.Types.FirstOrDefault(x => x.Name == "ILogger");
 		LogInfo($"Logger type: {LoggerTypeDefinition?.FullName}.");
 
 		if (LoggerTypeDefinition == null)
@@ -204,7 +204,7 @@ public class ModuleWeaver
 				if (assemblyPath != null)
 				{
 					CommonModuleDefinition = AssemblyDefinition.ReadAssembly(assemblyPath).MainModule;
-					LoggerTypeDefinition = CommonModuleDefinition.Types.FirstOrDefault(x => x.Name.Contains("CrmLog"));
+					LoggerTypeDefinition = CommonModuleDefinition.Types.FirstOrDefault(x => x.Name.Contains("ILogger"));
 					LogInfo($"Logger type: {LoggerTypeDefinition?.FullName}.");
 					ModuleDefinition.ImportReference(LoggerTypeDefinition);
 				}
@@ -217,29 +217,28 @@ public class ModuleWeaver
 
 		if (LoggerTypeDefinition == null)
 		{
-			throw new WeavingException("Cannot find CrmLog type in this assembly."
+			throw new WeavingException("Cannot find ILogger type in this assembly."
 				+ " Please make sure that Common.cs exists in the project or its assembly reference.");
 		}
 
 		StartMethod = CommonModuleDefinition.ImportReference(LoggerTypeDefinition
-			.FindMethod("LogFunctionStart", "LogEntry", "IExecutionContext", "String", "String", "String", "Int32"));
+			.FindMethod("LogFunctionStart", "LogEntry", "String", "Int32"));
 		StartMethod = ModuleDefinition.ImportReference(StartMethod);
 
 		ParamsMethod = CommonModuleDefinition.ImportReference(LoggerTypeDefinition
-			.FindMethod("LogKeyValues", "String", "String[]", "Object[]", "LogLevel", "String", "String",
-				"IExecutionContext", "String", "Int32"));
+			.FindMethod("LogKeyValues", "String", "String[]", "Object[]", "LogLevel", "String", "Int32"));
 		ParamsMethod = ModuleDefinition.ImportReference(ParamsMethod);
 
 		ExceptionMethod = CommonModuleDefinition.ImportReference(LoggerTypeDefinition
-			.FindMethod("Log", "Exception", "String", "String", "String", "String", "String", "String", "Int32"));
+			.FindMethod("Log", "Exception", "String", "String", "Int32"));
 		ExceptionMethod = ModuleDefinition.ImportReference(ExceptionMethod);
 
 		EndMethod = CommonModuleDefinition.ImportReference(LoggerTypeDefinition
-			.FindMethod("LogFunctionEnd", "LogEntry", "IExecutionContext", "String", "String", "String", "Int32"));
+			.FindMethod("LogFunctionEnd", "LogEntry", "String", "Int32"));
 		EndMethod = ModuleDefinition.ImportReference(EndMethod);
 
 		EndExecMethod = CommonModuleDefinition.ImportReference(LoggerTypeDefinition
-			.FindMethod("LogExecutionEndSuccessFlush", "LogEntry", "IExecutionContext", "String", "String", "String", "Int32"));
+			.FindMethod("LogExecutionEnd", "LogEntry", "ExecutionEndState", "String", "Int32"));
 		EndExecMethod = ModuleDefinition.ImportReference(EndExecMethod);
 
 		exceptionVariable = new VariableDefinition(ModuleDefinition.ImportReference(ExceptionType));
@@ -497,9 +496,6 @@ public class ModuleWeaver
 		instructions.Add(Instruction.Create(OpCodes.Ldloc, stringArrayVar));
 		instructions.Add(Instruction.Create(OpCodes.Ldloc, objectArrayVar));
 		instructions.Add(Instruction.Create(OpCodes.Ldc_I4, 40));
-		instructions.Add(Instruction.Create(OpCodes.Ldstr, ""));
-		instructions.Add(Instruction.Create(OpCodes.Ldstr, ""));
-		instructions.Add(Instruction.Create(OpCodes.Ldnull));
 		instructions.Add(Instruction.Create(OpCodes.Ldstr, Method.DisplayName()));
 
 		var lineNumber = 0;
@@ -533,10 +529,6 @@ public class ModuleWeaver
 	{
 		yield return Instruction.Create(IsInstanceLogger ? OpCodes.Ldfld : OpCodes.Ldsfld, LoggerField);
 		yield return Instruction.Create(OpCodes.Ldloc, exceptionVariable);
-		yield return Instruction.Create(OpCodes.Ldstr, "");
-		yield return Instruction.Create(OpCodes.Ldstr, "");
-		yield return Instruction.Create(OpCodes.Ldstr, "");
-		yield return Instruction.Create(OpCodes.Ldnull);
 		yield return Instruction.Create(OpCodes.Ldnull);
 		yield return Instruction.Create(OpCodes.Ldstr, Method.DisplayName());
 
@@ -561,9 +553,6 @@ public class ModuleWeaver
 
 		yield return Instruction.Create(IsInstanceLogger ? OpCodes.Ldfld : OpCodes.Ldsfld, LoggerField);
 		yield return Instruction.Create(OpCodes.Ldnull);
-		yield return Instruction.Create(OpCodes.Ldnull);
-		yield return Instruction.Create(OpCodes.Ldnull);
-		yield return Instruction.Create(OpCodes.Ldnull);
 		yield return Instruction.Create(OpCodes.Ldstr, Method.DisplayName());
 
 		var lineNumber = 0;
@@ -576,7 +565,27 @@ public class ModuleWeaver
 
 	private IEnumerable<Instruction> GetExecEndInstructions()
 	{
-		return AddWriteStartEnd(EndExecMethod, false);
+		return AddWriteExecEnd(EndExecMethod, false);
+	}
+
+	private IEnumerable<Instruction> AddWriteExecEnd(MethodReference writeMethod, bool isStartLine)
+	{
+		if (IsInstanceLogger)
+		{
+			yield return Instruction.Create(OpCodes.Ldarg_0);
+		}
+
+		yield return Instruction.Create(IsInstanceLogger ? OpCodes.Ldfld : OpCodes.Ldsfld, LoggerField);
+		yield return Instruction.Create(OpCodes.Ldnull);
+		yield return Instruction.Create(OpCodes.Ldc_I4, 0);
+		yield return Instruction.Create(OpCodes.Ldstr, Method.DisplayName());
+
+		var lineNumber = 0;
+		(isStartLine ? Method.Body.Instructions.First() : Method.Body.Instructions.Last())?
+			.TryGetLineNumber(Method, isStartLine, out lineNumber);
+		yield return Instruction.Create(OpCodes.Ldc_I4, lineNumber);
+
+		yield return Instruction.Create(IsInstanceLogger ? OpCodes.Callvirt : OpCodes.Call, writeMethod);
 	}
 
 	protected List<Instruction> GetReturnValueInstructions(VariableDefinition returnVariable)
@@ -632,9 +641,6 @@ public class ModuleWeaver
 		instructions.Add(Instruction.Create(OpCodes.Ldloc, stringArrayVar));
 		instructions.Add(Instruction.Create(OpCodes.Ldloc, objectArrayVar));
 		instructions.Add(Instruction.Create(OpCodes.Ldc_I4, 40));
-		instructions.Add(Instruction.Create(OpCodes.Ldstr, ""));
-		instructions.Add(Instruction.Create(OpCodes.Ldstr, ""));
-		instructions.Add(Instruction.Create(OpCodes.Ldnull));
 		instructions.Add(Instruction.Create(OpCodes.Ldstr, Method.DisplayName()));
 
 		var lineNumber = 0;

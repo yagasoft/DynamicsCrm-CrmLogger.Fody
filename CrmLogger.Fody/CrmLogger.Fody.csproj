@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,16 +35,16 @@
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\FodyCecil.2.1.2\lib\net40\Mono.Cecil.dll</HintPath>
+      <HintPath>..\packages\FodyCecil.2.4.6\lib\net46\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Mdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\FodyCecil.2.1.2\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+      <HintPath>..\packages\FodyCecil.2.4.6\lib\net46\Mono.Cecil.Mdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Pdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\FodyCecil.2.1.2\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+      <HintPath>..\packages\FodyCecil.2.4.6\lib\net46\Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\FodyCecil.2.1.2\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath>..\packages\FodyCecil.2.4.6\lib\net46\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,15 +64,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="buildscripts\publish-nuget-packages.ps1" />
-    <None Include="packages.config" />
     <None Include="CrmLogger.Fody.nuspec">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
     <None Include="tools\install.ps1" />
     <None Include="tools\uninstall.ps1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="nuget-access-key.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
@@ -80,9 +84,16 @@
   <PropertyGroup>
     <PostBuildEvent>$(SolutionDir)lib/nuget.exe pack $(ProjectPath) -Prop Configuration=Release
 copy /Y "$(TargetDir)*.nupkg" "C:\Nuget.Local\"
-copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)packages\CrmLogger.Fody.1.1.6\"</PostBuildEvent>
+copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)packages\CrmLogger.Fody.1.5.2\lib\net452\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)*.nupkg"</PreBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Fody.2.4.6\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.6\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.2.4.6\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.4.6\build\Fody.targets'))" />
+  </Target>
 </Project>
